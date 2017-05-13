@@ -1,0 +1,8 @@
+start left turn
+00:12 straight
+00:15 tree shadow
+00:22 bridge shadow
+00:25 different road surface
+00:26 slight right turn
+00:42 tree shadow
+00:50 straight
