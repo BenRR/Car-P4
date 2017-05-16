@@ -65,26 +65,34 @@ class Line:
                 self.recent_leftfit.pop(0)
                 self.recent_leftx.pop(0)
                 self.recent_lefty.pop(0)
+                # re-detect if cache is full
+                self.detected = False
             if len(self.recent_rightfit) > self.frame_n:
                 self.recent_rightfit.pop(0)
                 self.recent_rightx.pop(0)
                 self.recent_righty.pop(0)
+                # re-detect if cache is full
+                self.detected = False
 
             self.left_best_fit = np.average(self.recent_leftfit, axis=0)
             self.right_best_fit = np.average(self.recent_rightfit, axis=0)
             self.left_curve, self.right_curve = \
-                findlane.calculate_curve(self.ploty, self.left_best_fit, self.right_best_fit)
-            self.center_dist = findlane.center_dist(self.left_best_fit,self.right_best_fit)
+                findlane.calculate_curve(self.left_best_fit, self.right_best_fit)
+            self.center_dist = findlane.center_dist(self.left_best_fit, self.right_best_fit)
 
 
 def accept(current_fit, previous_fit):
     if previous_fit is None:
         return True
     else:
-        diffs =np.absolute(current_fit - previous_fit) / previous_fit
-        if not (diffs < np.array([0.5, 0.5, 0.2])).all():
-            return True
-        else:
+        y = findlane.get_maxy()
+        previous_base = previous_fit[0] * (y ** 2) + previous_fit[1] * y + previous_fit[2]
+        current_base = current_fit[0] * (y ** 2) + current_fit[1] * y + current_fit[2]
+        if abs(previous_base - current_base) > 10:
             return False
-
+        previous_curve = findlane.calculate_single_curve(previous_fit)
+        current_curve = findlane.calculate_single_curve(current_fit)
+        if abs(previous_curve - current_curve) > 30:
+            return False
+        return True
 

@@ -96,16 +96,17 @@ def find_lane_continue(binary_warped, left_fit, right_fit):
     return np.polyfit(lefty, leftx, 2), np.polyfit(righty, rightx, 2), leftx, rightx, lefty, righty
 
 
-def calculate_curve(ploty, left_fit, right_fit):
-
-    y_eval = np.max(ploty)
-    left_curverad = ((1 + (2 * left_fit[0] * y_eval + left_fit[1]) ** 2) ** 1.5) / np.absolute(2 * left_fit[0])
-    right_curverad = ((1 + (2 * right_fit[0] * y_eval + right_fit[1]) ** 2) ** 1.5) / np.absolute(2 * right_fit[0])
-    return left_curverad, right_curverad
+def calculate_single_curve(fit):
+    y_eval = get_maxy()
+    return ((1 + (2 * fit[0] * y_eval + fit[1]) ** 2) ** 1.5) / np.absolute(2 * fit[0])
 
 
-def calculate_curve_radius(ploty, leftx, rightx, lefty, righty):
-    y_eval = np.max(ploty)
+def calculate_curve(left_fit, right_fit):
+    return calculate_single_curve(left_fit), calculate_single_curve(right_fit)
+
+
+def calculate_curve_radius(leftx, rightx, lefty, righty):
+    y_eval = get_maxy()
     # Define conversions in x and y from pixels space to meters
     ym_per_pix = 30 / 720  # meters per pixel in y dimension
     xm_per_pix = 3.7 / 700  # meters per pixel in x dimension
@@ -124,17 +125,21 @@ def calculate_curve_radius(ploty, leftx, rightx, lefty, righty):
     # Define y-value where we want radius of curvature (choose bottom of the image)
 
 
+def get_maxy():
+    return 720
+
+
 def get_ploty():
-    return np.linspace(0, 719, num=720)  # to cover same y-range as image
+    return np.linspace(0, get_maxy() - 1, num=get_maxy())  # to cover same y-range as image
 
 
 def center_dist(left_fit, right_fit):
-    ploty = 720
+    ploty = get_maxy()
     center_x = 900
     left_x = left_fit[0] * ploty ** 2 + left_fit[1] * ploty + left_fit[2]
     right_x = right_fit[0] * ploty ** 2 + right_fit[1] * ploty + right_fit[2]
 
-    return np.absolute((right_x - left_x)/2 - center_x) * 3.7 / 700
+    return np.absolute(left_x + (right_x - left_x)/2 - center_x) * 3.7 / 700
 
 
 
