@@ -31,7 +31,7 @@ class Line:
     def update(self, image):
         if self.detected:
             leftfit, rightfit, leftx, rightx, lefty, righty = \
-                findlane.calculate_curve_radius(self.ploty, self.leftfit, self.rightfit)
+                findlane.find_lane_continue(image, self.leftfit, self.rightfit)
         else:
             leftfit, rightfit, leftx, rightx, lefty, righty =\
                 findlane.find_lane(image)
