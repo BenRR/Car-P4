@@ -127,3 +127,14 @@ def calculate_curve_radius(ploty, leftx, rightx, lefty, righty):
 def get_ploty():
     return np.linspace(0, 719, num=720)  # to cover same y-range as image
 
+
+def center_dist(left_fit, right_fit):
+    ploty = 720
+    center_x = 900
+    left_x = left_fit[0] * ploty ** 2 + left_fit[1] * ploty + left_fit[2]
+    right_x = right_fit[0] * ploty ** 2 + right_fit[1] * ploty + right_fit[2]
+
+    return np.absolute((right_x - left_x)/2 - center_x) * 3.7 / 700
+
+
+
