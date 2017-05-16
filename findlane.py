@@ -14,7 +14,7 @@ def find_lane(binary_warped):
 
     # Assuming you have created a warped binary image called "binary_warped"
     # Take a histogram of the bottom half of the image
-    histogram = np.sum(binary_warped[binary_warped.shape[0]/2:,:], axis=0)
+    histogram = np.sum(binary_warped[int(binary_warped.shape[0]/2):,:], axis=0)
     # Create an output image to draw on and  visualize the result
     out_img = np.dstack((binary_warped, binary_warped, binary_warped))*255
     # Find the peak of the left and right halves of the histogram
@@ -104,15 +104,15 @@ def calculate_curve(ploty, left_fit, right_fit):
     return left_curverad, right_curverad
 
 
-def calculate_curve_radius(ploty, leftx, rightx):
+def calculate_curve_radius(ploty, leftx, rightx, lefty, righty):
     y_eval = np.max(ploty)
     # Define conversions in x and y from pixels space to meters
     ym_per_pix = 30 / 720  # meters per pixel in y dimension
     xm_per_pix = 3.7 / 700  # meters per pixel in x dimension
 
     # Fit new polynomials to x,y in world space
-    left_fit_cr = np.polyfit(ploty * ym_per_pix, leftx * xm_per_pix, 2)
-    right_fit_cr = np.polyfit(ploty * ym_per_pix, rightx * xm_per_pix, 2)
+    left_fit_cr = np.polyfit(lefty * ym_per_pix, leftx * xm_per_pix, 2)
+    right_fit_cr = np.polyfit(righty * ym_per_pix, rightx * xm_per_pix, 2)
     # Calculate the new radii of curvature
     left_curverad = ((1 + (2 * left_fit_cr[0] * y_eval * ym_per_pix + left_fit_cr[1]) ** 2) ** 1.5) / np.absolute(
         2 * left_fit_cr[0])
@@ -121,6 +121,7 @@ def calculate_curve_radius(ploty, leftx, rightx):
     # Now our radius of curvature is in meters
     return left_curverad, right_curverad
     # Example values: 632.1 m    626.2 m
+    # Define y-value where we want radius of curvature (choose bottom of the image)
 
 
 def get_ploty():
