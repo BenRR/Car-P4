@@ -6,7 +6,7 @@ import findlane
 class Line:
     def __init__(self):
         # cache frame numbers
-        self.frame_n = 7
+        self.frame_n = 15 
         # was the line detected in the last iteration?
         self.detected = False
         self.leftfit = None
@@ -39,7 +39,7 @@ class Line:
         left_accept =  accept(leftfit, self.leftfit)
         right_accept = accept(rightfit, self.rightfit)
 
-        if left_accept:
+        if left_accept and right_accept:
             self.leftfit = leftfit
             self.leftx = leftx
             self.lefty = lefty
@@ -47,16 +47,13 @@ class Line:
             self.recent_leftx.append(leftx)
             self.recent_lefty.append(lefty)
 
-        if right_accept:
             self.rightfit = rightfit
             self.rightx = rightx
             self.righty = righty
             self.recent_rightfit.append(rightfit)
             self.recent_rightx.append(rightx)
             self.recent_righty.append(righty)
-
-        if left_accept and right_accept:
-            self.detected = True
+            # self.detected = True
         else:
             self.detected = False
 
@@ -88,11 +85,13 @@ def accept(current_fit, previous_fit):
         y = findlane.get_maxy()
         previous_base = previous_fit[0] * (y ** 2) + previous_fit[1] * y + previous_fit[2]
         current_base = current_fit[0] * (y ** 2) + current_fit[1] * y + current_fit[2]
-        if abs(previous_base - current_base) > 10:
+        if abs(previous_base - current_base) > 500:
+            print("rejected because of current_base")
             return False
         previous_curve = findlane.calculate_single_curve(previous_fit)
         current_curve = findlane.calculate_single_curve(current_fit)
-        if abs(previous_curve - current_curve) > 30:
+        if abs(previous_curve - current_curve) > 4000:
+            print("rejected because of current_curve")
             return False
         return True
 
