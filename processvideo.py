@@ -1,9 +1,10 @@
 import calibration
 import imagefilter
 import warp
+import drawlane
+import sys
 from moviepy.editor import VideoFileClip
 from line import Line
-import drawlane
 
 
 def process_video(video_file):
@@ -23,7 +24,8 @@ def process_video(video_file):
     return clip.fl_image(process_full) #NOTE: this function expects color images!!
 
 if __name__ == '__main__':
-    white_output = 'output_1.mp4'
-    white_clip = process_video("project_video.mp4")
+    assert (len(sys.argv) == 3), 'Need input and output video file names.'
+    white_output = sys.argv[2]
+    white_clip = process_video(sys.argv[1])
     white_clip.write_videofile(white_output, audio=False)
 
