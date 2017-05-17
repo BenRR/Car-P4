@@ -86,12 +86,12 @@ def accept(current_fit, previous_fit):
         previous_base = previous_fit[0] * (y ** 2) + previous_fit[1] * y + previous_fit[2]
         current_base = current_fit[0] * (y ** 2) + current_fit[1] * y + current_fit[2]
         if abs(previous_base - current_base) > 500:
-            print("rejected because of current_base")
+            #print("rejected because of current_base")
             return False
         previous_curve = findlane.calculate_single_curve(previous_fit)
         current_curve = findlane.calculate_single_curve(current_fit)
         if abs(previous_curve - current_curve) > 4000:
-            print("rejected because of current_curve")
+            #print("rejected because of current_curve")
             return False
         return True
 

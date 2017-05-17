@@ -18,8 +18,12 @@ def process_video(video_file):
         warped_img = warp.warp_img(cali_img, warp_m)
         filtered_img = imagefilter.color_gradient_filter(warped_img)
         lane_line.update(filtered_img)
-        output = drawlane.lane_image(filtered_img, img,in_m, lane_line.ploty, lane_line.left_best_fit,lane_line.right_best_fit)
+        output = drawlane.lane_image(filtered_img, img,in_m, lane_line.ploty,
+                                     lane_line.left_best_fit,lane_line.right_best_fit,
+                                     lane_line.left_curve, lane_line.right_curve,
+                                     lane_line.center_dist)
         return output
+
     clip = VideoFileClip(video_file)
     return clip.fl_image(process_full) #NOTE: this function expects color images!!
 
