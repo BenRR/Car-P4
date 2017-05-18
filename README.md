@@ -2,14 +2,14 @@
 
 [//]: # (Image References)
 
-[image1]: ./examples1/undistort_output.png "Undistorted chessboard"
-[image2]: ./test_images1/test1.jpg "undistort frame from origin"
-[image3]: ./examples1/binary_combo_example.jpg "Binary filter Example from origin"
-[image4]: ./examples1/warped_straight_lines.jpg "Warp frame from origin"
-[image5]: ./examples1/color_fit_lines.jpg "detect lane from the binary warped frame"
-[image6]: ./examples1/example_output.jpg "drawlane back to the original frame"
-[image7]: ./examples1/example_output.jpg "full process pipeline"
-[video1]: ./output.mp4 "Video"
+[image2]: output_images/image2.png "undistort frame from origin"
+[image3]: output_images/image3.png "binary filter Example from origin"
+[image4]: output_images/image4.png "Warp frame from origin"
+[image5]: output_images/image5.png "detect lane from the binary warped frame"
+[image51]: output_images/image51.png "detect lane from the binary warped frame"
+[image6]: output_images/image6.png "draw lane back to the original frame"
+[image7]: output_images/image7.png "full process pipeline"
+[video1]: output.mp4 "Video"
 
 ### Here I will consider the rubric points individually and describe how I addressed each point in my implementation.  
 
@@ -27,10 +27,9 @@
 To run the program `python processvideo.py project_video.mp4 output1.mp4` (carnd-term1 minicondo profile required)
 
 ### 1. Camera Calibration
+
 Following the lecture I use the provided images from camera_cal folder and `cv2.findChessboardCorners` with size `(9,6)` to collect image points then use `cv2.calibrateCamera` to calculate matrix and coefficients and use pickle to save them into `cam_cali.p` file so the values will be loaded from pickle after creation.
 Detailed code is available in `calibration.py`
-
-![alt text][image1]
 
 ### Pipeline
 
@@ -59,7 +58,7 @@ These are the source and destination points which are return value of `warp_poin
 | 1130, 720     | 1000, 720      |
 | 190, 720      | 300, 100        |
 
-I verified that my perspective transform was working as expected by drawing the `src` and `dst` points onto a test image and its warped counterpart to verify that the lines appear almost parallel in the warped image.
+I verified that my perspective transform was working as expected by verifying that the lines appear almost parallel in the warped image.
 
 ![alt text][image4]
 
@@ -71,6 +70,7 @@ It uses the sliding window search from bottom the picture. In the same file func
 Here is a plot of polynomial fits from binary warped frame.
 
 ![alt text][image5]
+![alt text][image51]
 
 #### 5. Curvature Radius and Center Distance
 
