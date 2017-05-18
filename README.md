@@ -1,127 +1,107 @@
-## Writeup Template
-
-### You can use this file as a template for your writeup if you want to submit it as a markdown file, but feel free to use some other method and submit a pdf if you prefer.
-
----
-
-**Advanced Lane Finding Project**
-
-The goals / steps of this project are the following:
-
-* Compute the camera calibration matrix and distortion coefficients given a set of chessboard images.
-* Apply a distortion correction to raw images.
-* Use color transforms, gradients, etc., to create a thresholded binary image.
-* Apply a perspective transform to rectify binary image ("birds-eye view").
-* Detect lane pixels and fit to find the lane boundary.
-* Determine the curvature of the lane and vehicle position with respect to center.
-* Warp the detected lane boundaries back onto the original image.
-* Output visual display of the lane boundaries and numerical estimation of lane curvature and vehicle position.
+** Advanced Lane Finding Project **
 
 [//]: # (Image References)
 
-[image1]: ./examples/undistort_output.png "Undistorted"
-[image2]: ./test_images/test1.jpg "Road Transformed"
-[image3]: ./examples/binary_combo_example.jpg "Binary Example"
-[image4]: ./examples/warped_straight_lines.jpg "Warp Example"
-[image5]: ./examples/color_fit_lines.jpg "Fit Visual"
-[image6]: ./examples/example_output.jpg "Output"
-[video1]: ./project_video.mp4 "Video"
-
-## [Rubric](https://review.udacity.com/#!/rubrics/571/view) Points
+[image1]: ./examples1/undistort_output.png "Undistorted chessboard"
+[image2]: ./test_images1/test1.jpg "undistort frame from origin"
+[image3]: ./examples1/binary_combo_example.jpg "Binary filter Example from origin"
+[image4]: ./examples1/warped_straight_lines.jpg "Warp frame from origin"
+[image5]: ./examples1/color_fit_lines.jpg "detect lane from the binary warped frame"
+[image6]: ./examples1/example_output.jpg "drawlane back to the original frame"
+[image7]: ./examples1/example_output.jpg "full process pipeline"
+[video1]: ./output.mp4 "Video"
 
 ### Here I will consider the rubric points individually and describe how I addressed each point in my implementation.  
 
----
+### Files
 
-### Writeup / README
+* calibration.py    - calculate and persist camera matrix and distortion coefficients
+* warp.py           - calculate and persist warp matrix and invert matrix
+* imagefilter.py    - color and gradient transforms to filter a image to binary
+* findlane.py       - find lanes from a warped binary image and other helper functions to calculate distance and curves
+* line.py           - class to cache frames to make video more smooth
+* drawlane.py       - plot road lanes on image
+* processvideo.py   - main entry to process a video
+* output.mp4   - the result video file generated from project_video.mp4
 
-#### 1. Provide a Writeup / README that includes all the rubric points and how you addressed each one.  You can submit your writeup as markdown or pdf.  [Here](https://github.com/udacity/CarND-Advanced-Lane-Lines/blob/master/writeup_template.md) is a template writeup for this project you can use as a guide and a starting point.  
+To run the program `python processvideo.py project_video.mp4 output1.mp4` (carnd-term1 minicondo profile required)
 
-You're reading it!
-
-### Camera Calibration
-
-#### 1. Briefly state how you computed the camera matrix and distortion coefficients. Provide an example of a distortion corrected calibration image.
-
-The code for this step is contained in the first code cell of the IPython notebook located in "./examples/example.ipynb" (or in lines # through # of the file called `some_file.py`).  
-
-I start by preparing "object points", which will be the (x, y, z) coordinates of the chessboard corners in the world. Here I am assuming the chessboard is fixed on the (x, y) plane at z=0, such that the object points are the same for each calibration image.  Thus, `objp` is just a replicated array of coordinates, and `objpoints` will be appended with a copy of it every time I successfully detect all chessboard corners in a test image.  `imgpoints` will be appended with the (x, y) pixel position of each of the corners in the image plane with each successful chessboard detection.  
-
-I then used the output `objpoints` and `imgpoints` to compute the camera calibration and distortion coefficients using the `cv2.calibrateCamera()` function.  I applied this distortion correction to the test image using the `cv2.undistort()` function and obtained this result: 
+### 1. Camera Calibration
+Following the lecture I use the provided images from camera_cal folder and `cv2.findChessboardCorners` with size `(9,6)` to collect image points then use `cv2.calibrateCamera` to calculate matrix and coefficients and use pickle to save them into `cam_cali.p` file so the values will be loaded from pickle after creation.
+Detailed code is available in `calibration.py`
 
 ![alt text][image1]
 
-### Pipeline (single images)
+### Pipeline
 
-#### 1. Provide an example of a distortion-corrected image.
+#### 1. Distortion-correction.
 
-To demonstrate this step, I will describe how I apply the distortion correction to one of the test images like this one:
+After calibration matrix and coefficients are persist `cv2.undistort` method can be used to undistort any given image. I have created function `cali_img` in `calibration.py` and later the function is used in `processvideo.py`. Here is result to undistort one example frame.
 ![alt text][image2]
 
-#### 2. Describe how (and identify where in your code) you used color transforms, gradients or other methods to create a thresholded binary image.  Provide an example of a binary image result.
+#### 2. Image Filtering
 
-I used a combination of color and gradient thresholds to generate a binary image (thresholding steps at lines # through # in `another_file.py`).  Here's an example of my output for this step.  (note: this is not actually from one of the test images)
+I used a combination of color and gradient thresholds to generate a binary image (thresholding steps at in `imagefilter.py`). I used codes provided from the lecture which has HLS color space and horizontal gradient filtering then I added HSV color space to filter out lane colors in videos mostly white and yellow. In the end I tune all parameters to get the best result as I can.
+Here's an example of my output for this step.
 
 ![alt text][image3]
 
-#### 3. Describe how (and identify where in your code) you performed a perspective transform and provide an example of a transformed image.
+#### 3. Perspective Transformation
 
-The code for my perspective transform includes a function called `warper()`, which appears in lines 1 through 8 in the file `example.py` (output_images/examples/example.py) (or, for example, in the 3rd code cell of the IPython notebook).  The `warper()` function takes as inputs an image (`img`), as well as source (`src`) and destination (`dst`) points.  I chose the hardcode the source and destination points in the following manner:
+The code for my perspective transform includes two functions in `warp.py`. `warp_ms` uses source and destination points that I manually chose to calculate warp matrix and inverse matrix then save them into pickle file. The other function `warp_img` can transform perspective for given image and warp matrix. These methods are used in `processvideo.py` as part of the pipeline.
 
-```python
-src = np.float32(
-    [[(img_size[0] / 2) - 55, img_size[1] / 2 + 100],
-    [((img_size[0] / 6) - 10), img_size[1]],
-    [(img_size[0] * 5 / 6) + 60, img_size[1]],
-    [(img_size[0] / 2 + 55), img_size[1] / 2 + 100]])
-dst = np.float32(
-    [[(img_size[0] / 4), 0],
-    [(img_size[0] / 4), img_size[1]],
-    [(img_size[0] * 3 / 4), img_size[1]],
-    [(img_size[0] * 3 / 4), 0]])
-```
+These are the source and destination points which are return value of `warp_points` function in `warp.py`:
 
-This resulted in the following source and destination points:
+| Source        | Destination   |
+|:-------------:|:-------------:|
+| 585, 455      | 300, 100        |
+| 705, 455      | 1000, 100      |
+| 1130, 720     | 1000, 720      |
+| 190, 720      | 300, 100        |
 
-| Source        | Destination   | 
-|:-------------:|:-------------:| 
-| 585, 460      | 320, 0        | 
-| 203, 720      | 320, 720      |
-| 1127, 720     | 960, 720      |
-| 695, 460      | 960, 0        |
-
-I verified that my perspective transform was working as expected by drawing the `src` and `dst` points onto a test image and its warped counterpart to verify that the lines appear parallel in the warped image.
+I verified that my perspective transform was working as expected by drawing the `src` and `dst` points onto a test image and its warped counterpart to verify that the lines appear almost parallel in the warped image.
 
 ![alt text][image4]
 
-#### 4. Describe how (and identify where in your code) you identified lane-line pixels and fit their positions with a polynomial?
+#### 4. Lane Detection
 
-Then I did some other stuff and fit my lane lines with a 2nd order polynomial kinda like this:
+The code for lane detection I used is mostly from the lecture. Function `find_lane` in `findlane.py` can generate lane polynomial fits(left and right) also pixels of left and right lane.
+It uses the sliding window search from bottom the picture. In the same file function `find_lane_continue` can skip the window search but find pixels around given previous lane fits.
+
+Here is a plot of polynomial fits from binary warped frame.
 
 ![alt text][image5]
 
-#### 5. Describe how (and identify where in your code) you calculated the radius of curvature of the lane and the position of the vehicle with respect to center.
+#### 5. Curvature Radius and Center Distance
 
-I did this in lines # through # in my code in `my_other_file.py`
+Curvature radius and distance calculation codes are in `findlane.py` by function `alculate_curve_radius` and `center_dist` which are used in `Line.py` later as part of the pipeline. The curvature radius and distance are plotted in the frame as well.
 
-#### 6. Provide an example image of your result plotted back down onto the road such that the lane area is identified clearly.
+#### 6. Plot Lanes
 
-I implemented this step in lines # through # in my code in `yet_another_file.py` in the function `map_lane()`.  Here is an example of my result on a test image:
+In file `drawlane.py` function `lane_image` can plot the detected lane polynomial fits with other information like radius and distance. The function is used in `processvideo.py` as part of the pipeline.
 
 ![alt text][image6]
 
+#### 7. Pipeline
+
+The main logic is in `processvideo.py` with function `process_video`. It firstly initialises a Line instance which will cache detected lanes. Then loads required configurations like undistort matrixes, coefficients, warp matrixes etc. Then the `process_full` method put all processes together and `clip.fl_image` uses this method to process each frame and generate the output video.
+
+![alt text][image7]
+
 ---
 
-### Pipeline (video)
+### Project Video Result
+To get the result video file, just run the program `python processvideo.py project_video.mp4 output1.mp4` (carnd-term1 minicondo profile required)
 
-#### 1. Provide a link to your final video output.  Your pipeline should perform reasonably well on the entire project video (wobbly lines are ok but no catastrophic failures that would cause the car to drive off the road!).
+Here's my result
 
-Here's a [link to my video result](./project_video.mp4)
+![my result][video1]
 
 ---
 
 ### Discussion
 
-#### 1. Briefly discuss any problems / issues you faced in your implementation of this project.  Where will your pipeline likely fail?  What could you do to make it more robust?
-
-Here I'll talk about the approach I took, what techniques I used, what worked and why, where the pipeline might fail and how I might improve it if I were going to pursue this project further.  
+* I found that warp the image then apply binary filtering can give me better result
+* Maybe apply region of interesting filter will help
+* My current binary filter is not working well with other challenge videos. More tuning should be done if I have more time.
+* Better lane acceptance checking and caching needed for challenge videos.
