@@ -83,7 +83,7 @@ In file `drawlane.py` function `lane_image` can plot the detected lane polynomia
 
 #### 7. Pipeline
 
-The main logic is in `processvideo.py` with function `process_video`. It firstly initialises a Line instance which will cache detected lanes. Then loads required configurations like undistort matrixes, coefficients, warp matrixes etc. Then the `process_full` method put all processes together and `clip.fl_image` uses this method to process each frame and generate the output video.
+The main logic is in `processvideo.py` with function `process_video`. It firstly initialises a Line instance which will cache detected lanes. Then loads required configurations like undistort matrixes, coefficients, warp matrixes etc. Then the `process_full` method put all processes together and `clip.fl_image` uses this method to process each frame and generate the output video. `Line.py` has the logic to cache frames that only accept lanes that pass sannity check also use the best fit and pixels positions for plotting.
 
 ![alt text][image7]
 
