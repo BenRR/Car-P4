@@ -1,4 +1,4 @@
-** Advanced Lane Finding Project **
+## Advanced Lane Finding Project
 
 [//]: # (Image References)
 
@@ -9,7 +9,6 @@
 [image51]: output_images/image51.png "detect lane from the binary warped frame"
 [image6]: output_images/image6.png "draw lane back to the original frame"
 [image7]: output_images/image7.png "full process pipeline"
-[video1]: output.mp4 "Video"
 
 ### Here I will consider the rubric points individually and describe how I addressed each point in my implementation.  
 
@@ -95,7 +94,8 @@ To get the result video file, just run the program `python processvideo.py proje
 
 Here's my result
 
-![my result][video1]
+[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/9M7rShHZ7Tw/0.jpg)](https://www.youtube.com/watch?v=9M7rShHZ7Tw)
+[youtube link](https://youtu.be/9M7rShHZ7Tw)
 
 ---
 
