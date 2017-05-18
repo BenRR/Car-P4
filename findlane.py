@@ -135,7 +135,7 @@ def get_ploty():
 
 def center_dist(left_fit, right_fit):
     ploty = get_maxy()
-    center_x = 900
+    center_x = 640
     left_x = left_fit[0] * ploty ** 2 + left_fit[1] * ploty + left_fit[2]
     right_x = right_fit[0] * ploty ** 2 + right_fit[1] * ploty + right_fit[2]
 

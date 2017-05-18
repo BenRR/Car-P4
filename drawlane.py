@@ -22,9 +22,9 @@ def lane_image(warped, origin, in_m, ploty, left_fit, right_fit, left_curve, rig
     newwarp = cv2.warpPerspective(color_warp, in_m, (warped.shape[1], warped.shape[0]))
     # Combine the result with the original image
     output = cv2.addWeighted(origin, 1, newwarp, 0.3, 0)
-    cv2.putText(output, 'left_curve: ' + str(left_curve), (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255,0), 2, cv2.LINE_AA)
-    cv2.putText(output, 'right_curve: ' + str(right_curve), (50, 90), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2,
+    cv2.putText(output, 'left_curve: ' + str(left_curve), (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255,255), 2, cv2.LINE_AA)
+    cv2.putText(output, 'right_curve: ' + str(right_curve), (50, 90), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2,
                 cv2.LINE_AA)
-    return cv2.putText(output, 'distance: ' + str(distance), (50, 130), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2,
+    return cv2.putText(output, 'distance: ' + str(distance), (50, 130), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2,
                 cv2.LINE_AA)
 
